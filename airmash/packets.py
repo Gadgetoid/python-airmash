@@ -1,124 +1,107 @@
-from commands import *
-
-class AdapterCoordX(Adapter):
-    def _encode(self, obj, ctx):
-        return int(obj * 2) + 32768
-    def _decode(self, obj, ctx):
-        return (obj - 32768) / 2.0
-
-class AdapterCoordY(Adapter):
-    def _encode(self, obj, ctx):
-        return (obj * 2) + 32768
-    def _decode(self, obj, ctx):
-        return (obj - 32768) / 2.0
-
-class AdapterRotation(Adapter):
-    def _encode(self, obj, ctx):
-        return int(obj * 6553.6)
-    def _decode(self, obj, ctx):
-        return obj / 6553.6
-
-class AdapterSpeed(Adapter):
-    def _encode(self, obj, ctx):
-        return int(obj * 1638.4) + 32768
-    def _decode(self, obj, ctx):
-        return (obj - 32768) / 1638.4
-
-class AdapterAccel(Adapter):
-    def _encode(self, obj, ctx):
-        return int(obj * 32768) + 32768
-    def _decode(self, obj, ctx):
-        return (obj - 32768) / 32768.0
-
-class AdapterRegen(Adapter):
-    def _encode(self, obj, ctx):
-        return int(obj * 1e6) + 32768
-    def _decode(self, obj, ctx):
-        return (obj - 32768) / 1e6
-
-class AdapterHealthEnergy(Adapter):
-    def _encode(self, obj, ctx):
-        return int(obj * 255)
-    def _decode(self, obj, ctx):
-        return obj / 255
-
-class AdapterCoord24(Adapter):
-    def _encode(self, obj, ctx):
-        return (obj * 512) + 8388608
-    def _decode(self, obj, ctx):
-        return (obj - 8388608) / 512.0
-
-CoordX = AdapterCoordX(Int16ul)
-CoordY = AdapterCoordY(Int16ul)
-Coord24 = AdapterCoord24(Int24ub)
-Rotation = AdapterRotation(Int16ul)
-
-Speed = AdapterSpeed(Int16ul)
-Accel = AdapterAccel(Int16ul)
-Regen = AdapterRegen(Int16ul)
-HealthEnergy = AdapterHealthEnergy(Int8ub)
-Text = PascalString(Int8ub, encoding='UTF-8')
-TextBig = PascalString(Int16ul, encoding='UTF-8')
+from types import *
 
 player = {
     player_commands['LOGIN']: Struct(
+        # Log in a player
+        # Players can log in anonymously by providing a 'session' value of 'none'
+        # Protocol: should be 4, TODO: enum is needed to describe the other available protocols
+        # Name: is the player name, up to 255 chars
+        # HorizonX: is the game screen width / 2
+        # HorizonY: is the game screen height / 2
+        # Flag: the two-letter country code of desired flag
         'command' / Default(PlayerCommands, 'LOGIN'),
         'protocol' / Int8ub,
         'name' / Text,
-        'session' / Text,
+        'session' / Default(Text, 'none'),
         'horizonX' / Int16ul,
         'horizonY' / Int16ul,
         'flag' / Text
     ),
     player_commands['BACKUP']: Struct(
+        # TODO: Figuere out what this is for
         'command' / Default(PlayerCommands, 'BACKUP'),
         'token' / Text
     ),
     player_commands['HORIZON']: Struct(
+        # Update horizon information
+        # Presumably called when the player resizes their browser window
+        # HorizonX: is the game screen width / 2
+        # HorizonY: is the game screen height / 2
         'command' / Default(PlayerCommands, 'HORIZON'),
         'horizonX' / Int16ul,
         'horizonY' / Int16ul,
     ),
     player_commands['ACK']: Struct(
+        # TODO: Figure out what this is for
+        # Have managed to maintain a connection to the server without ack-ing any packets
         'command' / Default(PlayerCommands, 'ACK')
     ),
     player_commands['PONG']: Struct(
+        # Reply to a PING from the server
+        # You *MUST* send this response in a timely fashion to avoid a disconnect
+        # num: is the num value as supplied by the PING command, although in practise I don't think the server cares
         'command' / Default(PlayerCommands, 'PONG'),
         'num' / Int32ul
     ),
     player_commands['KEY']: Struct(
+        # Send a key state for current player
+        # seg: a sequential number that increments with every key press, presumably so packets that arrive out of order are interpreted correctly?
+        # key: the key to change: UP, DOWN, LEFT, RIGHT, FIRE, SPECIAL
+        # state: the state of the key press: True or False
         'command' / Default(PlayerCommands, 'KEY'),
         'seq' / Int32ul,
         'key' / PlayerKeys,
         'state' / Flag
     ),
     player_commands['COMMAND']: Struct(
+        # Send a command to the server, eg: to switch to spectate mode: com = spectate, data = player ID
+        # com: command to send
+        # data: additional data for command
         'command' / Default(PlayerCommands, 'COMMAND'),
         'com' / Text,
         'data' / Text
     ),
     player_commands['SCOREDETAILED']: Struct(
+        # Request a detailed score table? TODO: clarify what this does
         'command' / Default(PlayerCommands, 'SCOREDETAILED'),
         'text' / Text
     ),
+    player_commands['CHAT']: Struct(
+        # Send a public chat message
+        # text: text to send - up to 255 chars
+        'command' / Default(PlayerCommands, 'CHAT'),
+        'text' / Text
+    ),
     player_commands['WHISPER']: Struct(
+        # Send a whisper to another player
+        # id: player ID to whisper
+        # text: text to send - up to 255 chars
         'command' / Default(PlayerCommands, 'WHISPER'),
         'id' / Int16ul,
         'text' / Text
     ),
     player_commands['SAY']: Struct(
+        # Send a local say message
+        # text: text to send - up to 255 chars
+        # Text can also be an emote in the format :emote:, eg: :pepe:
         'command' / Default(PlayerCommands, 'SAY'),
         'text' / Text
     ),
     player_commands['TEAMCHAT']: Struct(
+        # Send a team chat message
+        # text: text to send - up to 255 chars
+        # Since your team = your player ID in FFA and BR this would have no effect in those modes
         'command' / Default(PlayerCommands, 'TEAMCHAT'),
         'text' / Text
     ),
     player_commands['VOTEMUTE']: Struct(
+        # Vote to mute a player
+        # id: player ID you're voting to mute
         'command' / Default(PlayerCommands, 'VOTEMUTE'),
         'id' / Int16ul
     ),
     player_commands['LOCALPING']: Struct(
+        # TODO: figure out what this is for
         'command' / Default(PlayerCommands, 'LOCALPING'),
         'auth' / Int32ul
     )
@@ -126,6 +109,7 @@ player = {
 
 server = {
     server_commands['LOGIN']: Struct(
+        # Response from server to a player LOGIN
         'command' / Default(ServerCommands, 'LOGIN'),
         'success' / Flag,
         'id' / Int16ul,

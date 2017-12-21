@@ -101,7 +101,6 @@ def on_message(ws, message):
         for player in message.players:
             players[player.id] = Player(player.id, player)
             last_id = player.id
-            print(player)
         players[me].update(message)
         #cmd = packets.build_player_command('COMMAND', dict(
         #    com='spectate',
