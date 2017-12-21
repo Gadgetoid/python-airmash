@@ -2,6 +2,17 @@ from construct import *
 
 SERVER_ADDR = "wss://game-eu-s1.airma.sh/ffa1"
 
+emotes = [
+    'tf',
+    'pepe',
+    'clap',
+    'lol',
+    'bro',
+    'kappa',
+    'cry',
+    'rage'
+]
+
 error_types = {
     1: ('DISCONNECTED', 'Packet flooding detected'),
     2: ('BANNED', 'Packet flooding detected'),
