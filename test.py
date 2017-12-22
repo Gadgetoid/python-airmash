@@ -1,5 +1,6 @@
 from airmash import packets
 from airmash.player import Player
+from airmash.mob import Mob
 from airmash.country import COUNTRY_CODES
 import websocket
 import threading
@@ -174,7 +175,7 @@ def on_message(ws, message):
             projectile = projectiles[message.id]
             for player in message.players:
                 players[player.id].update(player)
-                print(u"Action: {} hit by {}'s {}".format(players[player.id].name, players[projectile.player_id].name, projectile.type))
+                print(u"Action: {} hit by {}'s {}".format(players[player.id].name, projectile.owner.name, projectile.type))
         return
 
     if message.command in ['EVENT_STEALTH', 'EVENT_REPEL', 'EVENT_BOOST', 'EVENT_BOUNCE', 'SCORE_UPDATE', 'PLAYER_LEVEL', 'PLAYER_TYPE', 'PLAYER_FIRE', 'PLAYER_RESPAWN', 'PLAYER_UPDATE']:
@@ -188,8 +189,8 @@ def on_message(ws, message):
 
         if message.command == 'PLAYER_FIRE':
             for projectile in message.projectiles:
-                projectiles[projectile.id] = projectile
-                projectile.player_id = message.id
+                print(u"Action: New projectile of type {}".format(projectile.type))
+                projectiles[projectile.id] = Mob(projectile.id, players[message.id], projectile)
             return
 
         if message.command == 'EVENT_STEALTH':
@@ -205,8 +206,10 @@ def on_message(ws, message):
             if message.command == 'EVENT_REPEL':
                 print(u"Action: {} uses repel. {} players and {} projectiles repelled.".format(players[message.id].name, len(message.players), len(message.mobs)))
                 for projectile in message.mobs:
-                    projectiles[projectile.id] = projectile
-                    projectile.player_id = message.id
+                    if projectile.id in projectiles:
+                        projectiles[projectile.id].update(projectile, new_owner=players[message.id])
+                    else:
+                        projectiles[projectile.id] = Mob(projectile.id, players[message.id], projectile)
             return
 
         return
@@ -246,14 +249,20 @@ def on_message(ws, message):
         # plus a uint16 "ping" value
         return
 
-    # Mobs are missiles? Or maybe upgrade crates? Or both?
-    if message.command == 'MOB_UPDATE':
+    # Mobs are missiles. But are they also upgrade crates and powerups?
+    if message.command in ['MOB_UPDATE', 'MOB_UPDATE_STATIONARY']:
+        print(u"Action: Mob update of type {}".format(message.type))
+        if message.id in projectiles:
+            projectiles[message.id].update(message)
+        else:
+            print("WARNING: Mob type of {} does not exist? {}".format(message.type, message.id))
+            projectiles[message.id] = Mob(message.id, None, message)
         return
-    if message.command == 'MOB_UPDATE_STATIONARY':
-        return
-    if message.command == 'MOB_DESPAWN':
-        return
-    if message.command == 'MOB_DESPAWN_COORDS':
+
+    if message.command in ['MOB_DESPAWN', 'MOB_DESPAWN_COORDS']:
+        if message.id in projectiles:
+            projectiles[message.id].update(message)
+            projectiles[message.id].despawn()
         return
 
     print(u"WARNING: Unhandled command: {}".format(message.command))

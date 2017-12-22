@@ -6,8 +6,8 @@ class Player():
     def __init__(self, id, data={}):
         self.online = True
         self.id = id
-        self.update(data)
         self._handlers = {}
+        self.update(data)
 
         #self._handlers['upgrades'] = ks
         #self._handlers['keystate'] = ks
@@ -29,7 +29,7 @@ class Player():
         self.speedX = self._get_default(data, 'speedX', 0)
         self.speedY = self._get_default(data, 'speedY', 0)
         self.type = self._get_default(data, 'type', 0)
-        #self.score = self._get_default(data, 'score', 0)
+        self.score = self._get_default(data, 'score', 0)
         self.earnings = self._get_default(data, 'earnings', 0)
         self.totalkills = self._get_default(data, 'totalkills', 0)
         self.totaldeaths = self._get_default(data, 'totaldeaths', 0)
@@ -39,8 +39,8 @@ class Player():
         self.healthRegen = self._get_default(data, 'healthRegen', 0)
 
         # This comes from Rankings, not sure why it's x/y
-        #self.x = self._get_default(data, 'x', 0)
-        #self.y = self._get_default(data, 'y', 0)
+        self.x = self._get_default(data, 'x', 0)
+        self.y = self._get_default(data, 'y', 0)
 
         for key in self.__dict__.keys():
             value = self.__dict__.get(key)

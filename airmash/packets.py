@@ -313,6 +313,7 @@ server = {
     ),
     server_commands['EVENT_REPEL']: Struct(
         # Command to indicate the Goliath's special repel ability
+        # players is a list of players repelled by the ability
         # mobs is a list of the projectiles that the Goliath player has taken ownership of by repelling
         'command' / Default(ServerCommands, 'EVENT_REPEL'),
         'clock' / Int32ul,
@@ -339,7 +340,7 @@ server = {
         )),
         'mobs' / PrefixedArray(Int8ub, Struct(
             'id' / Int16ul,
-            'type' / Int8ub,
+            'type' / MobTypes,
             'posX' / CoordX,
             'posY' / CoordY,
             'speedX' / Speed,
@@ -389,7 +390,7 @@ server = {
         'command' / Default(ServerCommands, 'MOB_UPDATE'),
         'clock' / Int32ul,
         'id' / Int16ul,
-        'type' / Int8ub,
+        'type' / MobTypes,
         'posX' / CoordX,
         'posY' / CoordY,
         'speedX' / Speed,
@@ -401,19 +402,19 @@ server = {
     server_commands['MOB_UPDATE_STATIONARY']: Struct(
         'command' / Default(ServerCommands, 'MOB_UPDATE_STATIONARY'),
         'id' / Int16ul,
-        'type' / Int8ub,
+        'type' / MobTypes,
         'posX' / Float32b,
         'posY' / Float32b
     ),
     server_commands['MOB_DESPAWN']: Struct(
         'command' / Default(ServerCommands, 'MOB_DESPAWN'),
         'id' / Int16ul,
-        'type' / Int8ub
+        'type' / MobTypes
     ),
     server_commands['MOB_DESPAWN_COORDS']: Struct(
         'command' / Default(ServerCommands, 'MOB_DESPAWN_COORDS'),
         'id' / Int16ul,
-        'type' / Int8ub,
+        'type' / MobTypes,
         'posX' / CoordX,
         'posY' / CoordY
     ),
