@@ -23,29 +23,36 @@ class ClientUpdate(StoppableThread):
         StoppableThread.__init__(self, *args, **kwargs)
 
     def run(self):
-        #key_num = 0
+        key_num = 0
         seq = 0
-        #keys = ['UP', 'DOWN', 'LEFT', 'RIGHT']
-        #states = {'UP': False, 'DOWN': False, 'LEFT': False, 'RIGHT': False}
+        state = True
+        keys = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'FIRE', 'SPECIAL']
+        states = {'UP': False, 'DOWN': False, 'LEFT': False, 'RIGHT': False, 'FIRE': False, 'SPECIAL': False}
         while not self.wait():
-            packet = packets.build_player_command('COMMAND', dict(com='respawn', data='2'))
-            ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
+            #my_status = players[me].status
+            #print("Status: {}".format(my_status))
+            #packet = packets.build_player_command('KEY', dict(seq=seq, key='FIRE', state=state))
+            #ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
+            #seq += 1
+            #state = not state
+            #packet = packets.build_player_command('COMMAND', dict(com='respawn', data='2'))
+            #ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
             #code = seq % len(COUNTRY_CODES.keys())
             #packet = packets.build_player_command('COMMAND', dict(com='flag', data=COUNTRY_CODES.keys()[code]))
             #ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
-            #key = keys[key_num % len(keys)]
-            #key_num += 1
-            #for old_key in keys:
-            #    if old_key != key:
-            #        if states[old_key]:
-            #            packet = packets.build_player_command('KEY', dict(seq=seq, key=old_key, state=False))
-            #            ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
-            #            states[old_key] = False
-            #            seq += 1
+            key = keys[key_num % len(keys)]
+            key_num += 1
+            for old_key in keys:
+                if old_key != key:
+                    if states[old_key]:
+                        packet = packets.build_player_command('KEY', dict(seq=seq, key=old_key, state=False))
+                        ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
+                        states[old_key] = False
+                        seq += 1
 
-            #packet = packets.build_player_command('KEY', dict(seq=seq, key=key, state=True))
-            #ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
-            #states[key] = True
+            packet = packets.build_player_command('KEY', dict(seq=seq, key=key, state=True))
+            ws.send(packet, opcode=websocket.ABNF.OPCODE_BINARY)
+            states[key] = True
             seq += 1
             #print("Position: {}:{}".format(me.posX, me.posY))
 
@@ -62,8 +69,8 @@ def on_open(ws):
         protocol=4,
         name='test',
         session='none',
-        horizonX=1024 / 2,
-        horizonY=768 / 2,
+        horizonX=1920 / 2,
+        horizonY=1920 / 2,
         flag='GB'
     ))
     ws.send(cmd, opcode=websocket.ABNF.OPCODE_BINARY)
@@ -102,6 +109,10 @@ def on_message(ws, message):
             players[player.id] = Player(player.id, player)
             last_id = player.id
         players[me].update(message)
+
+        #players[me].on_change('upgrades', ks)
+        #players[me].on_change('keystate', ks)
+
         #cmd = packets.build_player_command('COMMAND', dict(
         #    com='spectate',
         #    data=str(last_id)
@@ -137,12 +148,21 @@ def on_message(ws, message):
         return
 
     if message.command in ['EVENT_STEALTH', 'EVENT_REPEL', 'EVENT_BOOST', 'EVENT_BOUNCE', 'SCORE_UPDATE', 'PLAYER_HIT', 'PLAYER_LEVEL', 'PLAYER_TYPE', 'PLAYER_FIRE', 'PLAYER_RESPAWN', 'PLAYER_UPDATE']:
+
         # All of these commands trigger some change to the player state, so handle them together for now
         players[message.id].update(message)
         player = players[message.id]
 
+        if message.command == 'PLAYER_FIRE':
+        #    print("Player {} of type {} has fired {} projectiles!".format(player.name, player.type, len(message.projectiles)))
+        #    for projectile in message.projectiles:
+        #        print(projectile.type)
+            for projectile in message.projectiles:
+                pass
+            return
+
         if message.command == 'EVENT_STEALTH':
-            print("Player {} has gone into stealth!".format(player.name))
+            #print("Player {} has gone into stealth!".format(player.name))
             return
 
         # These commands trigger an update to multiple other players and have a `.players` array
@@ -156,7 +176,7 @@ def on_message(ws, message):
     if message.command == 'PLAYER_KILL':
         killer = players[message.killer].name
         killed = players[message.id].name
-        print("Player {} killed by {} at ({}, {})".format(killed, killer, message.posX, message.posY))
+        #print("Player {} killed by {} at ({}, {})".format(killed, killer, message.posX, message.posY))
         return
 
     if message.command == 'PLAYER_LEAVE':
@@ -170,6 +190,7 @@ def on_message(ws, message):
     if message.command == 'PLAYER_POWERUP':
         # Just has type and duration!? But no player id.
         # Does this mean we've picked up a powerup?
+        print(message)
         return
 
     if message.command == 'PLAYER_UPGRADE':

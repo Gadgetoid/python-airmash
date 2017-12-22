@@ -1,9 +1,16 @@
+
+def ks(player, k, a, b):
+    print("[{}] {}: {}".format(player.name, k, a))
+
 class Player():
     def __init__(self, id, data={}):
         self.online = True
         self.id = id
         self.update(data)
         self._handlers = {}
+
+        #self._handlers['upgrades'] = ks
+        #self._handlers['keystate'] = ks
 
     def update(self, data):
         old = self.__dict__.copy()
@@ -40,7 +47,7 @@ class Player():
             old_value = old.get(key)
             if value != old_value and old_value is not None:
                 #print("Player {} {} changed from {} to {}".format(self.name, key, old_value, value))
-                self._handle_change(key, old_value, new_value)
+                self._handle_change(key, old_value, value)
 
                 if key == 'posX' or key == 'posY':
                     self._handle_change('position', (old.get('posX'), old.get('posY')), (self.posX, self.posY))
@@ -56,9 +63,9 @@ class Player():
         #        print("Player {} {} changed from {} to {}".format(self.name, key, old_value, value))
 
     def _handle_change(self, key, old_value, new_value):
-        handler = self._handlers.get(key)
+        handler = self._handlers.get(key, None)
         if handler is not None and callable(handler):
-            handler(key, old_value, new_value)
+            handler(self, key, old_value, new_value)
 
     def _get_default(self, data, name, default):
         return data.get(name, self.__dict__.get(name, default))

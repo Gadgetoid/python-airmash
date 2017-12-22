@@ -33,6 +33,30 @@ error_types = {
     100:('ERROR', 'Unknown command')
 }
 
+player_status = {
+    'alive': 0,
+    'dead': 1
+}
+
+PlayerStatus = Enum(Int8ul, **player_status)
+
+# Type 1: Predator single missile
+# Type 2: Goliath single big missile
+# Type 3: Mohawk rocket
+# Type 5: Tornado single-shot
+# Type 6: Tornado triple-shot
+# Type 7: Prowler single-shot
+missile_types = {
+    'Predator': 1,
+    'Goliath': 2,
+    'Mohawk': 3,
+    'Tornado Single': 5,
+    'Tornado Triple': 6,
+    'Prowler': 7
+}
+
+MissileTypes = Enum(Int8ul, **missile_types)
+
 ship_types = {
     'Predator': 1,
     'Goliath': 2,
@@ -209,3 +233,14 @@ HealthEnergy = AdapterHealthEnergy(Int8ub)
 # Shorthand for Text and TextBig types used by Airmash
 Text = PascalString(Int8ub, encoding='UTF-8')
 TextBig = PascalString(Int16ul, encoding='UTF-8')
+
+# Bitfield type for player key state
+KeyState = BitStruct(
+    None / Padding(2),
+    "SPECIAL" / Flag,
+    "FIRE" / Flag,
+    "RIGHT" / Flag,
+    "LEFT" / Flag,
+    "DOWN" / Flag,
+    "UP" / Flag
+)

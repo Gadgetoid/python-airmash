@@ -120,7 +120,7 @@ server = {
         'room' / Text,
         'players' / PrefixedArray(Int16ul, Struct(
             'id' / Int16ul,
-            'status' / Int8ub,
+            'status' / PlayerStatus,
             'level' / Int8ub,
             'name' / Text,
             'type' / ShipTypes,
@@ -136,20 +136,27 @@ server = {
         'command' / Default(ServerCommands, 'BACKUP')
     ),
     server_commands['PING']: Struct(
+        # Ping request from server,
+        # you must reply with PONG
         'command' / Default(ServerCommands, 'PING'),
         'clock' / Int32ul,
         'num' / Int32ul
     ),
     server_commands['PING_RESULT']: Struct(
+        # TODO: figure out what this is for
         'command' / Default(ServerCommands, 'PING_RESULT'),
         'ping' / Int16ul,
         'playerstotal' / Int32ul,
         'playersgame' / Int32ul
     ),
     server_commands['ACK']: Struct(
+        # TODO: figure out what this is for
         'command' / Default(ServerCommands, 'ACK')
     ),
     server_commands['ERROR']: Struct(
+        # Error code sent from server
+        # This can include notifications for disconnection/ban/kick and also throttling
+        # see `error_types` for a list of valid codes
         'command' / Default(ServerCommands, 'ERROR'),
         'error' / Int8ub
     ),
@@ -159,9 +166,10 @@ server = {
         'text' / TextBig
     ),
     server_commands['PLAYER_NEW']: Struct(
+        # Sent from the server to notify a new player has jointed
         'command' / Default(ServerCommands, 'PLAYER_NEW'),
         'id' / Int16ul,
-        'status' / Int8ub,
+        'status' / PlayerStatus,
         'name' / Text,
         'type' / ShipTypes,
         'team' / Int16ul,
@@ -172,14 +180,16 @@ server = {
         'upgrades' / Int8ub
     ),
     server_commands['PLAYER_LEAVE']: Struct(
+        # Sent from the server to notify a player has left
         'command' / Default(ServerCommands, 'PLAYER_LEAVE'),
         'id' / Int16ul
     ),
     server_commands['PLAYER_UPDATE']: Struct(
+        # Sent from the server to notify a player has been updated
         'command' / Default(ServerCommands, 'PLAYER_UPDATE'),
         'clock' / Int32ul,
         'id' / Int16ul,
-        'keystate' / Int8ub,
+        'keystate' / KeyState, # 1 = UP, 2 = DOWN, 4 = LEFT, 8 = RIGHT
         'upgrades' / Int8ub,
         'posX' / Coord24,
         'posY' / Coord24,
@@ -195,7 +205,7 @@ server = {
         'energyRegem' / Regen,
         'projectiles' / PrefixedArray(Int8ub, Struct(
             'id' / Int16ul,
-            'type' / Int8ub,
+            'type' / MissileTypes,
             'posX' / CoordX,
             'posY' / CoordY,
             'speedX' / Speed,
@@ -257,6 +267,9 @@ server = {
         'type' / ShipTypes
     ),
     server_commands['PLAYER_POWERUP']: Struct(
+        # Sent whenever a player gains a powerup
+        # Type only ever seems to be 1, does not distinguish between Shield or Rampage
+        # As far as I can tell, the JS client ignores this command?
         'command' / Default(ServerCommands, 'PLAYER_POWERUP'),
         'type' / Int8ub,
         'duration' / Int32ul
@@ -307,7 +320,7 @@ server = {
         'energyRegen' / Regen,
         'players' / PrefixedArray(Int8ub, Struct(
             'id' / Int16ul,
-            'keystate' / Int8ub,
+            'keystate' / KeyState,
             'posX' / CoordX,
             'posY' / CoordY,
             'rot' / Rotation,
@@ -347,7 +360,7 @@ server = {
         'command' / Default(ServerCommands, 'EVENT_BOUNCE'),
         'clock' / Int32ul,
         'id' / Int16ul,
-        'keystate' / Int8ub,
+        'keystate' / KeyState,
         'posX' / CoordX,
         'posY' / CoordY,
         'rot' / Rotation,
