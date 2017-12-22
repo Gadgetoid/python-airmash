@@ -62,9 +62,8 @@ player = {
         'data' / Text
     ),
     player_commands['SCOREDETAILED']: Struct(
-        # Request a detailed score table? TODO: clarify what this does
-        'command' / Default(PlayerCommands, 'SCOREDETAILED'),
-        'text' / Text
+        # Request a detailed score table from the server
+        'command' / Default(PlayerCommands, 'SCOREDETAILED')
     ),
     player_commands['CHAT']: Struct(
         # Send a public chat message
@@ -233,6 +232,8 @@ server = {
         'flag' / Int16ul
     ),
     server_commands['PLAYER_HIT']: Struct(
+        # The id here is the id of the hit, not a player ID,
+        # I bet this ID relates to the projectile
         'command' / Default(ServerCommands, 'PLAYER_HIT'),
         'id' / Int16ul,
         'type' / Int8ub,
@@ -253,6 +254,9 @@ server = {
         'posY' / CoordY
     ),
     server_commands['PLAYER_UPGRADE']: Struct(
+        # Sent whenever a player applies an upgrade point, or maybe collects one?
+        # Haven't seen this appear as anything other than 0 on all fronts,
+        # so presumably the individual values apply to the current player?
         'command' / Default(ServerCommands, 'PLAYER_UPGRADE'),
         'upgrades' / Int16ul,
         'type' / Int8ub,
@@ -308,6 +312,8 @@ server = {
         'speed' / Float32b
     ),
     server_commands['EVENT_REPEL']: Struct(
+        # Command to indicate the Goliath's special repel ability
+        # mobs is a list of the projectiles that the Goliath player has taken ownership of by repelling
         'command' / Default(ServerCommands, 'EVENT_REPEL'),
         'clock' / Int32ul,
         'id' / Int16ul,
@@ -422,22 +428,36 @@ server = {
     ),
     server_commands['SCORE_BOARD']: Struct(
         'command' / Default(ServerCommands, 'SCORE_BOARD'),
-        'data' / PrefixedArray(Int8ub, Struct(
+        'data' / PrefixedArray(Int16ul, Struct(
             'id' / Int16ul,
             'score' / Int32ul,
-            'level' / Int8ub
+            'level' / Int8ul
         )),
-        'rankings' / PrefixedArray(Int8ub, Struct(
+        'rankings' / PrefixedArray(Int16ul, Struct(
             'id' / Int16ul,
-            'x' / Int8ub,
-            'y' / Int8ub
+            'x' / Int8ul,
+            'y' / Int8ul
         ))
     ),
     server_commands['SCORE_DETAILED']: Struct(
+        # Table of scores for players
         'command' / Default(ServerCommands, 'SCORE_DETAILED'),
-        'scores' / PrefixedArray(Int8ub, Struct(
+        'scores' / PrefixedArray(Int16ul, Struct(
+            'id' / Int16ul,
+            'level' / Int8ul,
+            'score' / Int32ul,
+            'kills' / Int16ul,
+            'deaths' / Int16ul,
+            'damage' / Float32l,
+            'ping' / Int16ul
+        ))
+    ),
+    server_commands['SCORE_DETAILED_CTF']: Struct(
+        'command' / Default(ServerCommands, 'SCORE_DETAILED_CTF'),
+        'scores' / PrefixedArray(Int16ul, Struct(
             'id' / Int16ul,
             'level' / Int8ub,
+            'captures' / Int16ul,
             'score' / Int32ul,
             'kills' / Int16ul,
             'deaths' / Int16ul,
@@ -445,9 +465,9 @@ server = {
             'ping' / Int16ul
         ))
     ),
-    server_commands['SCORE_DETAILED_CTF']: Struct(
-        'command' / Default(ServerCommands, 'SCORE_DETAILED_CTF'),
-        'scores' / PrefixedArray(Int8ub, Struct(
+    server_commands['SCORE_DETAILED_BTR']: Struct(
+        'command' / Default(ServerCommands, 'SCORE_DETAILED_BTR'),
+        'scores' / PrefixedArray(Int16ul, Struct(
             'id' / Int16ul,
             'level' / Int8ub,
             'alive' / Flag,
@@ -500,9 +520,9 @@ server = {
     )
 }
 
-def build_player_command(command, contents):
+def build_player_command(command,  **kwargs):
     id = player_commands[command]
-    return player[id].build(contents)
+    return player[id].build(kwargs)
 
 def decode_server_command(command):
     id = ord(command[0])

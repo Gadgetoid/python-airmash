@@ -47,12 +47,12 @@ PlayerStatus = Enum(Int8ul, **player_status)
 # Type 6: Tornado triple-shot
 # Type 7: Prowler single-shot
 missile_types = {
-    'Predator': 1,
-    'Goliath': 2,
-    'Mohawk': 3,
-    'Tornado Single': 5,
-    'Tornado Triple': 6,
-    'Prowler': 7
+    'Predator Missile': 1,
+    'Goliath Missile': 2,
+    'Mohawk Rocket': 3,
+    'Tornado Single Missile': 5,
+    'Tornado Triple Missile': 6,
+    'Prowler Missile': 7
 }
 
 MissileTypes = Enum(Int8ul, **missile_types)

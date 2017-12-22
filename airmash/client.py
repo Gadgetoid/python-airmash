@@ -15,14 +15,14 @@ class Client:
         :param flag: two-letter country code of flag (default GB)
         
         """
-        packet = packets.build_player_command('LOGIN', dict(
+        packet = packets.build_player_command('LOGIN',
             protocol=protocol,
             name=name,
             session=session,
             horizonX=horizon[0],
             horizonY=horizon[1],
             flag=flag
-        ))
+        )
         self.send(packet)
 
     def horizon(self, x, y):
@@ -32,7 +32,7 @@ class Client:
         :param y: vertical screen resolution divided by 2
         
         """
-        packet = packets.build_player_command('HORIZON', dict(horizonX=x, horizonY=y))
+        packet = packets.build_player_command('HORIZON', horizonX=x, horizonY=y)
         self.send(packet)
 
     def pong(self, num):
@@ -41,7 +41,7 @@ class Client:
         :param num: num value from server ping packet
 
         """
-        packet = packets.build_player_command('PONG', dict(num=num))
+        packet = packets.build_player_command('PONG', num=num)
         self.send(packet)
 
     def command(self, command, data):
@@ -51,10 +51,10 @@ class Client:
         :param data: text for additional data
 
         """
-        packet = packets.build_player_command('COMMAND', dict(
+        packet = packets.build_player_command('COMMAND',
             com=command,
             data=data
-        ))
+        )
         self.send(packet)
 
     def spectate(self, player):
@@ -74,9 +74,7 @@ class Client:
         :param text: chat text- 0 to 255 chars
 
         """
-        packet = packets.build_player_command('CHAT', dict(
-            text=text
-        ))
+        packet = packets.build_player_command('CHAT', text=text)
         self.send(packet)
     
     def whisper(self, player, text):
@@ -89,10 +87,10 @@ class Client:
         if not isinstance(player, Player):
             raise ValueError("player must be an instance of Player")
 
-        packet = packets.build_player_command('WHISPER', dict(
+        packet = packets.build_player_command('WHISPER',
             id=player.id,
             text=text
-        ))
+        )
         self.send(packet)
 
     def teamchat(self, text):
@@ -101,9 +99,7 @@ class Client:
         :param text: text to send- 0 to 255 chars
 
         """
-        packet = packets.build_player_command('TEAMCHAT', dict(
-            text=text
-        ))
+        packet = packets.build_player_command('TEAMCHAT', text=text)
         self.send(packet)
 
     def say(self, text):
@@ -115,9 +111,7 @@ class Client:
         if not isinstance(player, Player):
             raise ValueError("player must be an instance of Player")
 
-        packet = packets.build_player_command('SAY', dict(
-            text=text
-        ))
+        packet = packets.build_player_command('SAY', text=text)
         self.send(packet)
 
     def emote(self, emote):
