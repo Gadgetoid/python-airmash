@@ -1,6 +1,10 @@
 from .types import *
-import urllib.request
-import http.client
+
+try:
+    from urllib.request import Request, urlopen
+except ImportError:
+    from urllib2 import Request, urlopen
+
 import json
 import time
 
@@ -34,10 +38,10 @@ def get_data():
         print("Sending cached data...")
         return cached_data
 
-    request = urllib.request.Request(GAMES_ADDR)
+    request = Request(GAMES_ADDR)
     request.add_header('Referer', 'https://airma.sh')
     request.add_header('User-Agent', 'Mozilla/5.0')
-    url = urllib.request.urlopen(request)
+    url = urlopen(request)
     data = json.loads(url.read().decode())
     src_regions = json.loads(data['data'])
     
