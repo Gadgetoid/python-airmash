@@ -1,4 +1,4 @@
-from types import *
+from .types import *
 
 player = {
     player_commands['LOGIN']: Struct(
@@ -526,7 +526,9 @@ def build_player_command(command,  **kwargs):
     return player[id].build(kwargs)
 
 def decode_server_command(command):
-    id = ord(command[0])
+    id = command[0]
+    if isinstance(id, str):
+        id = ord(id)
     #name = server_commands.keys()[server_commands.values().index(id)]
     #print("Parsing Command ID: {}, Name: {}".format(id, name))
     return server[id].parse(command)

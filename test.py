@@ -2,9 +2,12 @@ from airmash import packets
 from airmash.player import Player
 from airmash.mob import Mob
 from airmash.country import COUNTRY_CODES
+from airmash import games
 import websocket
 import threading
 import time
+
+GAME_HOST = games.get_url('eu', 'ffa1')
 
 ws = None
 
@@ -76,11 +79,11 @@ def on_open(ws):
     global _t_update
     print("### Opened ###")
     cmd = packets.build_player_command('LOGIN',
-        protocol=4,
+        protocol=games.get_protocol(),
         name='test',
         session='none',
-        horizonX=1920 / 2,
-        horizonY=1920 / 2,
+        horizonX=int(1920 / 2),
+        horizonY=int(1920 / 2),
         flag='GB'
     )
     ws.send(cmd, opcode=websocket.ABNF.OPCODE_BINARY)
@@ -273,7 +276,7 @@ def on_error(ws, error):
 def run():
     global ws
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp(packets.SERVER_ADDR,
+    ws = websocket.WebSocketApp(GAME_HOST,
         subprotocols=['binary'],
         on_message = on_message,
         on_error = on_error,

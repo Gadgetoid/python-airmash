@@ -1,6 +1,11 @@
 from construct import *
 
+# JSON API for data about existing games
+GAMES_ADDR = "https://airma.sh/games"
+
 SERVER_ADDR = "wss://game-eu-s1.airma.sh/ffa1"
+
+GAME_ADDR = "wss://game-{host}.airma.sh/{room}"
 
 emotes = [
     'tf',
