@@ -1,5 +1,12 @@
 from construct import *
 
+DEBUG_INFO = 0
+DEBUG_ACTION = 1
+DEBUG_WARNING = 2
+DEBUG_ERROR = 3
+
+DEBUG_TEXT = ["Info", "Action", "Warning", "Error"]
+
 # JSON API for data about existing games
 GAMES_ADDR = "https://airma.sh/games"
 
