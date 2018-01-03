@@ -233,7 +233,7 @@ class AdapterCoord24(Adapter):
 # Define types for various ship telemetry
 CoordX = AdapterCoordX(Int16ul)
 CoordY = AdapterCoordY(Int16ul)
-Coord24 = AdapterCoord24(Int24ub)
+Coord24 = AdapterCoord24(Int24ul)
 Rotation = AdapterRotation(Int16ul)
 Speed = AdapterSpeed(Int16ul)
 Accel = AdapterAccel(Int16ul)
