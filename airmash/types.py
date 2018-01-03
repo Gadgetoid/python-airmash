@@ -226,9 +226,12 @@ class AdapterCoord24(Adapter):
     """Converts a uint24 to 0-16384
     producing a high-precision X or Y coordinate"""
     def _encode(self, obj, ctx):
-        return (obj * 512) + 8388608
+        obj = int((obj * 512) + 8388608)
+        return ((obj << 16) & 0xff0000) | (obj >> 8)
     def _decode(self, obj, ctx):
-        return (obj - 8388608) / 512.0
+        # The 24bit high-precision Coord24 has a really weird byte order
+        unpacked = ((obj << 8) & 0xffff00) | (obj >> 16)
+        return (unpacked - 8388608) / 512.0
 
 # Define types for various ship telemetry
 CoordX = AdapterCoordX(Int16ul)
