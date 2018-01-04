@@ -1,3 +1,4 @@
+import math
 
 def ks(player, k, a, b):
     print("[{}] {}: {}".format(player.name, k, a))
@@ -8,6 +9,8 @@ class Player():
         self.id = id
         self._handlers = {}
         self.update(data)
+        self.posX = 0
+        self.posY = 0
 
         #self._handlers['upgrades'] = ks
         #self._handlers['keystate'] = ks
@@ -72,3 +75,18 @@ class Player():
 
     def on_change(self, key, handler):
         self._handlers[key] = handler
+
+    def dist_from(self, other):
+      return math.sqrt((self.posX - other.posX)**2 + (self.posY - other.posY)**2)
+
+    def angle_to(self, other):
+      """
+Hairy. On the world map, straight up is the Y axis, and is also direction 0. In the standard
+interpretation of the atan2 function, angles are measured from the X axis. Thus, atan2(x,y)
+is used here rather than the more expected y,x order of arguments.
+The values for x and y are from self, so we subtract the values of other from self.
+      """ 
+      ang = math.atan2((-self.posX + other.posX),(self.posY - other.posY))
+      if (ang < 0):
+        ang += math.pi * 2
+      return ang
