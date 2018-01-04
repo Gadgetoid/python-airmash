@@ -25,7 +25,7 @@ class Player():
         self.upgrades = self._get_default(data, 'upgrade', 0)
         self.posX = self._get_default(data, 'posX', 0)
         self.posY = self._get_default(data, 'posY', 0)
-        self.rotation = self._get_default(data, 'rot', 0)
+        self.rotation = self._get_default(data, 'rotation', 0)
         self.speedX = self._get_default(data, 'speedX', 0)
         self.speedY = self._get_default(data, 'speedY', 0)
         self.type = self._get_default(data, 'type', 0)

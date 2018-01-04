@@ -126,7 +126,7 @@ server = {
             'team' / Int16ul,
             'posX' / CoordX,
             'posY' / CoordY,
-            'rot' / Rotation,
+            'rotation' / Rotation,
             'flag' / Int16ul,
             'upgrades' / Int8ub
         ))
@@ -174,7 +174,7 @@ server = {
         'team' / Int16ul,
         'posX' / CoordX,
         'posY' / CoordY,
-        'rot' / Rotation,
+        'rotation' / Rotation,
         'flag' / Int16ul,
         'upgrades' / Int8ub
     ),
@@ -192,7 +192,7 @@ server = {
         'upgrades' / Int8ub,
         'posX' / Coord24,
         'posY' / Coord24,
-        'rot' / Rotation,
+        'rotation' / Rotation,
         'speedX' / Speed,
         'speedY' / Speed
     ),
@@ -223,7 +223,7 @@ server = {
         'id' / Int16ul,
         'posX' / Coord24,
         'posY' / Coord24,
-        'rot' / Rotation,
+        'rotation' / Rotation,
         'upgrades' / Int8ub
     ),
     server_commands['PLAYER_FLAG']: Struct(
@@ -320,7 +320,7 @@ server = {
         'id' / Int16ul,
         'posX' / CoordX,
         'posY' / CoordY,
-        'rot' / Rotation,
+        'rotation' / Rotation,
         'speedX' / Speed,
         'speedY' / Speed,
         'energy' / HealthEnergy,
@@ -330,7 +330,7 @@ server = {
             'keystate' / KeyState,
             'posX' / CoordX,
             'posY' / CoordY,
-            'rot' / Rotation,
+            'rotation' / Rotation,
             'speedX' / Speed,
             'speedY' / Speed,
             'energy' / HealthEnergy,
@@ -357,7 +357,7 @@ server = {
         'boost' / Flag,
         'posX' / CoordX,
         'posY' / CoordY,
-        'rot' / Rotation,
+        'rotation' / Rotation,
         'speedX' / Speed,
         'speedY' / Speed,
         'energy' / HealthEnergy,
@@ -370,7 +370,7 @@ server = {
         'keystate' / KeyState,
         'posX' / CoordX,
         'posY' / CoordY,
-        'rot' / Rotation,
+        'rotation' / Rotation,
         'speedX' / Speed,
         'speedY' / Speed,
     ),

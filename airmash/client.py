@@ -5,7 +5,7 @@ from . import games
 import websocket
 
 class Client:
-    def __init__(self):
+    def __init__(self, enable_debug=False, enable_chat=True):
         self._handlers = {}
         self.players = {}
         self.projectiles = {}
@@ -14,6 +14,8 @@ class Client:
         self._login_name = None
         self._login_flag = None
         self.connected = False
+        self._enable_debug = enable_debug
+        self._enable_chat = enable_chat
         self._key_seq = 0
 
     def on(self, key, handler=None):
@@ -53,9 +55,13 @@ class Client:
         return self.players[self.player_id]
 
     def _debug_print(self, level, text):
+        if not self._enable_debug:
+            return
         print("{}: {}".format(packets.DEBUG_TEXT[level], text))
 
     def _chat_print(self, text):
+        if not self._enable_chat:
+            return
         print(text)
 
     def _call_handler(self, message):

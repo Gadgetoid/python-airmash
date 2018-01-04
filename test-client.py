@@ -20,15 +20,29 @@ class ClientUpdate(StoppableThread):
     def run(self):
         while not self.wait():
             if client.connected:
-                client.key('UP', True)
-                print("Me: {}, {}".format(client.player.posX, client.player.posY))
+                client.key('LEFT', True)
 
+def track_position(player, key, old, new):
+    new = [int(x) for x in new]
+    print("Position: {} {}".format(*new))
 
-client = Client()
+def track_rotation(player, key, old, new):
+    print("Rotation: {}".format(new))
+
+client = Client(enable_debug=False)
 
 @client.on('LOGIN')
 def on_login(client, message):
     print("Client has logged in!")
+    print("Player ID: {}".format(client.player.id))
+    client.player.on_change('position', track_position)
+    client.player.on_change('rotation', track_rotation)
+
+@client.on('PLAYER_HIT')
+def on_hit(client, message):
+    for player in message.players:
+        if player.id == client.player.id:
+            print("Uh oh! I've been hit!")
 
 _t_update = ClientUpdate()
 _t_update.start()
@@ -38,7 +52,7 @@ client.connect(
     flag='GB',
     region='eu',
     room='ffa1',
-    enable_trace=True
+    enable_trace=False
 )
 
 _t_update.stop()
