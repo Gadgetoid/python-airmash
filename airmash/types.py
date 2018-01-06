@@ -185,8 +185,7 @@ class AdapterCoordX(Adapter):
         return (obj - 32768) / 2.0
 
 class AdapterCoordY(Adapter):
-    """Converts X coordinate from a uint16 to the range +-16384
-    Although the default map only uses a +-8192 vertical range"""
+    """Converts Y coordinate from a uint16 to the range +-8192"""
     def _encode(self, obj, ctx):
         return (obj * 4) + 32768
     def _decode(self, obj, ctx):

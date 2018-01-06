@@ -1,3 +1,5 @@
+# Collection of textures, including the file source, crop if it's a multi-texture sprite, and the anchor position
+# Presumably anchor .5 .5 implies positions are relative to the center of the texture
 textures = {
     "mountain1": {"texture": "mountains", "crop": (512, 512, 512, 512), "anchor": (.5, .5)},
     "mountain2": {"texture": "mountains", "crop": (0, 512, 512, 512), "anchor": (.5, .5)},
@@ -529,7 +531,14 @@ mountains = [
     (-7030, -7301, 4, .7, None, None, None)
 ]
 
-walls: [
+# These are, presumably, the grey airfields under the flag positions and in the center of the map
+doodads = [
+    (-9670, -1470, "doodadField", .5, 0, None, None),
+    (8600, -940, "doodadField", .5, 0, None, None),
+    (920, -2800, "doodadField", .5, 0, None, None)
+]
+
+walls = [
     # PosX, PosY, Radius
     (1009, -2308, 108),
     (1241, -2490, 60),
@@ -1051,10 +1060,4 @@ walls: [
     (-7297, -6946, 108),
     (-8148, -7137, 84),
     (-7030, -7301, 84)
-]
-
-doodads = [
-    (-9670, -1470, "doodadField", .5, 0, None, None),
-    (8600, -940, "doodadField", .5, 0, None, None),
-    (920, -2800, "doodadField", .5, 0, None, None)
 ]
